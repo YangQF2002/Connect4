@@ -1,8 +1,7 @@
 from helper_functions import available_moves
 
 class Human:
-    @staticmethod
-    def make_move(board, filled_squares):
+    def make_move(self, board, filled_squares):
         while True:
             temp = input("Enter your move in the format: row,col ").strip().split(",")
             try:

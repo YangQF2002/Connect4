@@ -9,8 +9,7 @@ DIFFICULTY = 7
 class SmartAI:
     cache = {}  # stores mappings of a particular board config (game state) to its evaluated value
 
-    @staticmethod
-    def find_empty_spaces(board, b_width=width, b_height=height):
+    def find_empty_spaces(self, board, b_width=width, b_height=height):
         count = 0
         for i in range(b_height):  
             for j in range(b_width):  
@@ -19,8 +18,7 @@ class SmartAI:
 
         return count
 
-    @staticmethod
-    def evaluate_curr_pos(board, b_width=width, b_height=height):
+    def evaluate_curr_pos(self, board, b_width=width, b_height=height):
         score = 0   
         mid_col = (b_width - 1) // 2  # index of mid col
 
@@ -78,23 +76,22 @@ class SmartAI:
                 
         return score
 
-    @staticmethod
-    def minimax(is_max, board, depth, alpha, beta):
+    def minimax(self, is_max, board, depth, alpha, beta):
         # base cases - handling of terminal nodes
         # 1. nodes that result in win/loss/draw
         # 2. nodes that have reached a certain depth (exploring the game tree beyond this depth would take too much time)
         res = check_win(board)
         if res is not None:
             if res == "X": 
-                return 1 + SmartAI.find_empty_spaces(board)
+                return 1 + self.find_empty_spaces(board)
                
             else:
-                return -1 - SmartAI.find_empty_spaces(board)
+                return -1 - self.find_empty_spaces(board)
                
                     
         elif depth == DIFFICULTY:
             # additional func to evaluate the curr board state
-            return SmartAI.evaluate_curr_pos(board)  
+            return self.evaluate_curr_pos(board)  
 
         elif is_full(board) is True:
             return 0
@@ -105,11 +102,11 @@ class SmartAI:
             for move in available_moves(board):
                 board[move[0]][move[1]] = "X"
                 immutable_board = tuple(map(tuple, board))
-                if immutable_board in SmartAI.cache:
-                    move_value = SmartAI.cache[immutable_board]
+                if immutable_board in self.cache:
+                    move_value = self.cache[immutable_board]
                 else:
-                    move_value = SmartAI.minimax(False, board, depth + 1, alpha, beta)  # each recursive call goes 1 level deeper into the game tree
-                    SmartAI.cache[immutable_board] = move_value  # store state into the cache
+                    move_value = self.minimax(False, board, depth + 1, alpha, beta)  # each recursive call goes 1 level deeper into the game tree
+                    self.cache[immutable_board] = move_value  # store state into the cache
                 
                 # undo the move so that we can try other moves 
                 board[move[0]][move[1]] = "-"
@@ -126,11 +123,11 @@ class SmartAI:
             for move in available_moves(board):
                 board[move[0]][move[1]] = "O"
                 immutable_board = tuple(map(tuple, board))
-                if immutable_board in SmartAI.cache:
-                    move_value = SmartAI.cache[immutable_board]
+                if immutable_board in self.cache:
+                    move_value = self.cache[immutable_board]
                 else:
-                    move_value = SmartAI.minimax(True, board, depth + 1, alpha, beta)  # each recursive call goes 1 level deeper into the game tree
-                    SmartAI.cache[immutable_board] = move_value # store state into cache 
+                    move_value = self.minimax(True, board, depth + 1, alpha, beta)  # each recursive call goes 1 level deeper into the game tree
+                    self.cache[immutable_board] = move_value # store state into cache 
 
                 # undo the move so that we can try other moves 
                 board[move[0]][move[1]] = "-"
@@ -141,8 +138,7 @@ class SmartAI:
 
             return best_value
 
-    @staticmethod
-    def make_move(board, ai_piece):
+    def make_move(self, board, ai_piece):
         best_move = (0, 0)
         # account for both cases, when AI is a maximizer (ie: plays X) or when its a minimizer (ie: plays O) 
         best_value = -inf if ai_piece == "X" else +inf 
@@ -152,7 +148,7 @@ class SmartAI:
 
         for move in available_moves(board):
             board[move[0]][move[1]] = ai_piece
-            move_value = SmartAI.minimax(is_maximizer, board, 0, -inf, +inf)
+            move_value = self.minimax(is_maximizer, board, 0, -inf, +inf)
             board[move[0]][move[1]] = "-"
 
             if ai_piece == "X" and move_value > best_value:

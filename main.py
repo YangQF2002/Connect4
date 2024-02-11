@@ -3,10 +3,10 @@ from human_player import Human
 from smart_ai_player import SmartAI 
 from dumb_ai_player import DumbAI
 
-
+# at some point, create an interface for this game (ie: using pygame or something)
 def select_piece(): 
     while True: 
-        player_piece = input("Play as X or O? ").upper().strip()
+        player_piece = input("Play as X or O? X goes first! ").upper().strip()
         match player_piece: 
             case "X":
                 ai_piece = "O"
@@ -39,7 +39,9 @@ def play_game(board):
     player_piece = pieces_chosen[0]
     ai_piece = pieces_chosen[1]
 
-    ai_player = select_ai()
+    ai_class = select_ai()
+    human_player = Human() 
+    ai_player = ai_class()
 
     # if player starts first, show them the board initially so they can make the first move 
     if player_piece == "X":
@@ -51,13 +53,13 @@ def play_game(board):
     while is_full(board) is False:
         print(f'{curr_letter}\'s turn to move! ')
         if curr_letter == player_piece:
-            move = Human.make_move(board, filled_squares)
+            move = human_player.make_move(board, filled_squares)
         else:
             # curr_letter == ai_piece
-            if ai_player == SmartAI: 
-                move = SmartAI.make_move(board, ai_piece)
+            if ai_class == SmartAI: 
+                move = ai_player.make_move(board, ai_piece) 
             else:
-                move = DumbAI.make_move(board) 
+                move = ai_player.make_move(board) 
 
         board[move[0]][move[1]] = curr_letter  # move is structured as a two-item tuple
         filled_squares.append(move)
@@ -71,7 +73,7 @@ def play_game(board):
                 return 0
             else:
                 # ai_piece == res 
-                if ai_player == SmartAI: 
+                if ai_class == SmartAI: 
                     return 1
                 else: 
                     return 2 
